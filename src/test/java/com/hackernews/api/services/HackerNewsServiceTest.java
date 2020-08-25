@@ -64,13 +64,9 @@ public class HackerNewsServiceTest {
 
   @Test
   public void test_topComments_SortingLogic_PastServedAddition() {
-    when(hackerNewsApiClient.storyDetails(ID)).thenReturn(StoryDetails.builder()
-                                                              .kids(Collections.singletonList(ID1))
-                                                              .build());
-    when(hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(Collections
-                                                                             .singletonList(ID1)))
-        .thenReturn(Collections.singletonMap(ID1, ONE));
-    when(hackerNewsApiClient.commentDetails(ID1)).thenReturn(CommentDetails.builder()
+    when(hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(ID))
+        .thenReturn(Collections.singletonMap(ID, ONE));
+    when(hackerNewsApiClient.commentDetails(ID)).thenReturn(CommentDetails.builder()
                                                                  .by(AUTHOR)
                                                                  .build());
     when(hackerNewsApiClient.userDetails(AUTHOR)).thenReturn(UserDetails.builder()

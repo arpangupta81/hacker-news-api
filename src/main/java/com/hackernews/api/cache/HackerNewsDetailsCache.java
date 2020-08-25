@@ -35,6 +35,7 @@ public class HackerNewsDetailsCache {
     log.info("Fetching all top stories from API");
     List<Long> allStoriesIds = hackerNewsApiClient.topStories();
     log.info("Number of top stories from API are : {}", allStoriesIds.size());
+    // TODO: 2020-08-25 This can be moved to a Elasticache/Redis with TTL keys expiring 10 mins
     return allStoriesIds.stream().parallel()
         .map(id -> {
           log.debug("Fetching Details for the story with id : {}", id);
@@ -46,12 +47,14 @@ public class HackerNewsDetailsCache {
    * This will fetch all the id's of the stories from top-stories endpoint of the API.
    * Then it makes separate call for each item to fetch the detail for that id.
    *
+   * @param storyId Story Id for which comments are to be fetched.
    * @return List of {@link StoryDetails}
    */
   @Cacheable(value = "PARENT_COMMENTS_CACHE")
-  public Map<Long, Integer> getAllParentCommentIdsToNumberOfChildren(List<Long> parentCommentIds) {
-    log.info("Fetching Parent Comments details from API");
-    return parentCommentIds.stream().parallel()
+  public Map<Long, Integer> getAllParentCommentIdsToNumberOfChildren(long storyId) {
+    List<Long> kids = hackerNewsApiClient.storyDetails(storyId).getKids();
+    log.info("Fetching child comments and their details for parents : {}", kids);
+    return kids.stream().parallel()
         .collect(Collectors.toMap(Function.identity(), parentComment -> {
           AtomicInteger counter = new AtomicInteger(INITIAL_VALUE);
           return makeApiCallAndIncreaseCount(parentComment, counter);
@@ -93,6 +96,7 @@ public class HackerNewsDetailsCache {
   public void putServedItemsToCache(List<StoryDetailsUi> servedStoryDetails) {
     log.info("Adding stories with ids : {} to already served items",
              servedStoryDetails.stream().map(StoryDetailsUi::getId).collect(Collectors.toList()));
+    // TODO: 2020-08-25 This can be moved to a NoSQL database: Eg. Cassandra
     alreadyServedStoryDetails.addAll(servedStoryDetails);
   }
 }

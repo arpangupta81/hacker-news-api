@@ -22,7 +22,8 @@ public class CacheConfiguration {
    */
   @Scheduled(fixedDelayString = "${spring.cache.expire.delay:600000}")
   public void cacheEvict() {
-    log.info("Evicting Hacker-News Top Stories Cache");
+    // TODO: 2020-08-25 This can be moved to a Elasticache/Redis with TTL keys expiring 10 mins
+    log.info("Evicting Hacker-News Top Stories and Parent Comments Cache");
     Objects.requireNonNull(cacheManager.getCache(TOP_STORIES_CACHE)).clear();
     Objects.requireNonNull(cacheManager.getCache(PARENT_COMMENTS_CACHE)).clear();
   }

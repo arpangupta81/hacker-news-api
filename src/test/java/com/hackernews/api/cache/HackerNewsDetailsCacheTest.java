@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import com.hackernews.api.HnApiBackendApplication;
 import com.hackernews.api.client.HackerNewsApiClient;
 import com.hackernews.api.model.client.CommentDetails;
+import com.hackernews.api.model.client.StoryDetails;
 import java.util.Collections;
 import org.junit.After;
 import org.junit.Test;
@@ -26,6 +27,8 @@ public class HackerNewsDetailsCacheTest {
 
   private static final String TOP_STORIES_CACHE = "TOP_STORIES_CACHE";
   private static final String PARENT_COMMENTS_CACHE = "PARENT_COMMENTS_CACHE";
+  private static final long ID1 = 1L;
+  private static final long ID = 123L;
   @MockBean
   private HackerNewsApiClient hackerNewsApiClient;
   @Autowired
@@ -78,23 +81,30 @@ public class HackerNewsDetailsCacheTest {
 
   @Test
   public void topCommentsWhenFetchedFromApi() {
-    when(hackerNewsApiClient.commentDetails(123)).thenReturn(CommentDetails.builder().build());
-    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(Collections.singletonList(123L));
+    when(hackerNewsApiClient.storyDetails(ID)).thenReturn(StoryDetails.builder()
+                                                              .kids(Collections.singletonList(ID1))
+                                                              .build());
+    when(hackerNewsApiClient.commentDetails(1L)).thenReturn(CommentDetails.builder()
+                                                                 .kids(Collections.emptyList())
+                                                                 .build());
+    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(123L);
     clearCache();
-    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(Collections.singletonList(123L));
+    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(123L);
     clearCache();
-    verify(hackerNewsApiClient, times(2)).commentDetails(123);
+    verify(hackerNewsApiClient, times(2)).storyDetails(123L);
   }
 
   @Test
   public void topCommentsWhenFetchedFromCache() {
-    when(hackerNewsApiClient.commentDetails(123L)).thenReturn(CommentDetails.builder()
-                                                                  .kids(Collections.singletonList(1L))
-                                                                  .build());
-    when(hackerNewsApiClient.commentDetails(1L)).thenReturn(CommentDetails.builder().build());
-    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(Collections.singletonList(123L));
-    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(Collections.singletonList(123L));
-    verify(hackerNewsApiClient, times(1)).commentDetails(123);
+    when(hackerNewsApiClient.storyDetails(ID)).thenReturn(StoryDetails.builder()
+                                                              .kids(Collections.singletonList(ID1))
+                                                              .build());
+    when(hackerNewsApiClient.commentDetails(1L)).thenReturn(CommentDetails.builder()
+                                                                .kids(Collections.emptyList())
+                                                                .build());
+    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(123L);
+    hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(123L);
+    verify(hackerNewsApiClient, times(1)).storyDetails(123L);
   }
 
   @Test

@@ -88,8 +88,8 @@ public class HackerNewsService {
    * @return {@link CommentDetails} list.
    */
   public List<CommentDetailsUi> topCommentsForStory(long storyId) {
-    List<Long> kids = hackerNewsApiClient.storyDetails(storyId).getKids();
-    return hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(kids)
+    log.info("Fetching top parent comments for story-id: {}", storyId);
+    return hackerNewsDetailsCache.getAllParentCommentIdsToNumberOfChildren(storyId)
         .entrySet().stream()
         .sorted(Map.Entry.<Long, Integer>comparingByValue().reversed())
         .limit(noOfTopCommentsResults)
@@ -99,6 +99,7 @@ public class HackerNewsService {
   }
 
   private CommentDetailsUi addUserDetailsToComment(CommentDetails commentDetails) {
+    log.info("Fetching user details for user-id: {}", commentDetails.getBy());
     UserDetails userDetails = hackerNewsApiClient.userDetails(commentDetails.getBy());
     return CommentDetailsUi.from(commentDetails, userDetails);
   }
