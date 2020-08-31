@@ -2,7 +2,7 @@ package com.hackernews.api.client;
 
 import com.hackernews.api.model.client.CommentDetails;
 import com.hackernews.api.model.client.StoryDetails;
-import com.hackernews.api.model.client.UserDetails;
+import com.hackernews.api.model.ui.UserDetails;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

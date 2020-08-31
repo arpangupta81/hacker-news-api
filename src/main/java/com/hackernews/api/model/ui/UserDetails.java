@@ -1,12 +1,17 @@
-package com.hackernews.api.model.client;
+package com.hackernews.api.model.ui;
 
+import java.io.Serializable;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Data
-public class UserDetails {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDetails implements Serializable {
   private String id;
   private String about;
   private long created;

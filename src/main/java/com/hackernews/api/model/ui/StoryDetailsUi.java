@@ -4,10 +4,16 @@ import com.hackernews.api.model.client.StoryDetails;
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 @Data
 @Builder
+@Table("story_details")
 public class StoryDetailsUi {
+  @PrimaryKeyColumn
+  @Id
   private long id;
   private String author;
   private long score;
